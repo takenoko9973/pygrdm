@@ -10,4 +10,5 @@ load_dotenv()
 access_token = os.environ.get("ACCESS_TOKEN")
 client = grdm.GRDMClient(access_token)
 
-print(client.fetch_file_url("j4wxd", "/raw/RHEED"))
+node_file = client.fetch_node_file("j4wxd", "/raw/RHEED")
+print(grdm.GRDMUrl.get_files_list_url(node_file))

@@ -26,7 +26,7 @@ class NodeFile:
                 "name": "",
                 "kind": Kind.FOLDER,
                 "provider": provider,
-                "materialized_path": "/",
+                "materialized_path": "",
             },
             "relationships": {"target": {"data": {"id": node_id}}},
         }
