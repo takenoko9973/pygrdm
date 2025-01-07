@@ -2,6 +2,8 @@ from http import HTTPStatus
 
 import requests
 
+from pygrdm.node import NodeFile, NodeFilesList
+
 
 class GRDMClient:
     def __init__(self, token: str, domain: str = "rdm.nii.ac.jp") -> None:
@@ -21,39 +23,38 @@ class GRDMClient:
 
     @staticmethod
     def get_osfstorage_url(
-        node: str,
-        osf_id: str | None = None,
+        node_file: NodeFile,
         domain: str = "rdm.nii.ac.jp",
     ) -> str:
-        if osf_id is None:
-            return f"https://api.{domain}/v2/nodes/{node}/files/osfstorage/"
+        if node_file.id == "":
+            return f"https://api.{domain}/v2/nodes/{node_file.node_id}/files/osfstorage/"
 
-        return f"https://api.{domain}/v2/nodes/{node}/files/osfstorage/{osf_id}/"
+        return f"https://api.{domain}/v2/nodes/{node_file.node_id}/files/osfstorage/{node_file.id}/"
 
     def fetch_file_url(self, node: str, osf_path: str) -> str | None:
         if osf_path == "":
             return None
 
-        now_osf_id = ""
+        now_node_file = NodeFile.create_root(node, "osfstorage")
         directries = osf_path.split("/")
         for dir_name in directries:
             if dir_name == "":
                 continue
 
-            files = self.fetch_file_list(node, now_osf_id)
-            if files is None:
+            node_file_list = self.fetch_file_list(now_node_file)
+            if node_file_list is None:
                 return None
 
-            searched_list = list(filter(lambda file: file["name"] == dir_name, files))
-            if len(searched_list) == 0:
+            searched_node = node_file_list.search_file(dir_name)
+            if searched_node is None:
                 return None
 
-            now_osf_id = searched_list[0]["id"]
+            now_node_file = searched_node
 
-        return GRDMClient.get_osfstorage_url(node, osf_id=now_osf_id, domain=self._domain)
+        return GRDMClient.get_osfstorage_url(now_node_file, domain=self._domain)
 
-    def fetch_file_list(self, node: str, osf_id: str = "") -> list | None:
-        url = GRDMClient.get_osfstorage_url(node, osf_id, domain=self._domain)
+    def fetch_file_list(self, node_file: NodeFile) -> NodeFilesList | None:
+        url = GRDMClient.get_osfstorage_url(node_file, domain=self._domain)
         response = requests.get(url, headers=self._headers, timeout=2000)
 
         if response.status_code != HTTPStatus.OK:
@@ -61,12 +62,4 @@ class GRDMClient:
             print("レスポンス:", response.text)
             return None
 
-        data = response.json()["data"]
-        return [
-            {
-                "id": dat["id"],
-                "name": dat["attributes"]["name"],
-                "materialized_path": dat["attributes"]["materialized_path"],
-            }
-            for dat in data
-        ]
+        return NodeFilesList(response)
