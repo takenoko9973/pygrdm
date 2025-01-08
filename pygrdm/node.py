@@ -24,7 +24,7 @@ class NodeFile:
             "id": "",
             "attributes": {
                 "name": "",
-                "kind": Kind.FOLDER,
+                "kind": Kind.FOLDER.value,
                 "provider": provider,
                 "materialized_path": "",
             },
@@ -45,7 +45,7 @@ class NodeFile:
         return self._name
 
     @property
-    def kind(self) -> Kind:
+    def kind(self) -> str:
         return self._kind
 
     @property
@@ -55,6 +55,30 @@ class NodeFile:
     @property
     def materialized_path(self) -> str:
         return self._materialized_path
+
+    def get_detail_url(self, domain: str = "rdm.nii.ac.jp") -> str | None:
+        if self.id == "":
+            return None
+
+        return f"https://api.{domain}/v2/files/{self.id}/"
+
+    def get_files_list_url(self, domain: str = "rdm.nii.ac.jp") -> str:
+        url = f"https://api.{domain}/v2/nodes/{self.node_id}/files/{self.provider}/"
+
+        if self.id != "":
+            url += f"{self.id}/"
+        return url
+
+    def get_download_url(self, domain: str = "rdm.nii.ac.jp") -> str | None:
+        if self.id is None:
+            return None
+
+        if self.kind == Kind.FILE.value:
+            return f"https://files.{domain}/v1/resources/{self.node_id}/providers/{self.provider}/{self.id}"
+        if self.kind == Kind.FOLDER.value:
+            return f"https://files.{domain}/v1/resources/{self.node_id}/providers/{self.provider}/{self.id}/?zip="
+
+        return None
 
 
 class NodeFilesList:
