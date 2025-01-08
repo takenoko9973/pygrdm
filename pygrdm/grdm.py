@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from pathlib import Path
 
 import requests
 
@@ -53,3 +54,21 @@ class GRDMClient:
             return None
 
         return NodeFilesList(response)
+
+    def download_node(self, node_file: NodeFile, filename: str | Path | None = None) -> None:
+        if filename is None:
+            filename = Path(node_file.name)
+        elif filename is str:
+            filename = Path(filename)
+
+        url = node_file.get_download_url(domain=self._domain)
+
+        response = requests.get(url, headers=self._headers, timeout=2000)
+        if response.status_code != HTTPStatus.OK:
+            print("ユーザ情報の取得に失敗しました。ステータスコード:", response.status_code)
+            print("レスポンス:", response.text)
+            return
+
+        url_data = response.content
+        with filename.open(mode="wb") as f:
+            f.write(url_data)
