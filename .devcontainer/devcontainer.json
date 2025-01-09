@@ -7,6 +7,10 @@
             "settings": {
                 "python.defaultInterpreterPath": "/home/user/micromamba/bin/python",
                 "python.terminal.activateEnvironment": true,
+                "python.terminal.activateEnvInCurrentTerminal": true,
+                "python.analysis.extraPaths": [
+                    "./src"
+                ],
                 "[python]": {
                     "editor.formatOnPaste": true,
                     "editor.defaultFormatter": "charliermarsh.ruff",
@@ -15,10 +19,7 @@
                         "source.fixAll": "explicit",
                         "source.organizeImports": "explicit"
                     }
-                },
-                "ruff.lint.args": [
-                    "--config=pyproject.toml"
-                ]
+                }
             },
             "extensions": [
                 "ms-python.python",
@@ -28,7 +29,9 @@
                 "ms-toolsai.jupyter",
                 "VisualStudioExptTeam.vscodeintellicode",
                 "VisualStudioExptTeam.intellicode-api-usage-examples",
-                "ms-toolsai.datawrangler"
+                "ms-toolsai.datawrangler",
+                "tamasfe.even-better-toml",
+                "mhutchie.git-graph"
             ]
         }
     },
