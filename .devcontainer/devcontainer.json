@@ -1,5 +1,5 @@
 {
-    "name": "python-mamba",
+    "name": "pygrdm-project",
     "dockerFile": "./Dockerfile",
     "init": true,
     "customizations": {
