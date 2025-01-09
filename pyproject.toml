@@ -11,7 +11,7 @@ classifiers = [
 ]
 license = {text = "MIT"}
 requires-python = "==3.12.*"
-dependencies = ["tqdm>=^4.67"]
+dependencies = []
 
 [project.urls]
 Repository = "https://github.com/takenoko9973/pygrdm.git"
