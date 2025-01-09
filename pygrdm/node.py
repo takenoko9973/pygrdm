@@ -82,8 +82,8 @@ class NodeFile:
 
 
 class NodeFilesList:
-    def __init__(self, response: requests.Response) -> None:
-        json_data = response.json()["data"]
+    def __init__(self, responsed_json: Any) -> None:  # noqa: ANN401
+        json_data = responsed_json["data"]
         self._i = 0
         self._node_file_list = [NodeFile(d) for d in json_data]
 

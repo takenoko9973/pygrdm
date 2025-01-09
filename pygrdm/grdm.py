@@ -47,14 +47,14 @@ class GRDMClient:
 
     def fetch_file_list(self, node_file: NodeFile) -> NodeFilesList | None:
         url = node_file.get_files_list_url(domain=self._domain)
-        response = requests.get(url, headers=self._headers, timeout=2000)
 
-        if response.status_code != HTTPStatus.OK:
-            print("情報の取得に失敗しました。ステータスコード:", response.status_code)
-            print("レスポンス:", response.text)
-            return None
+        with requests.get(url, headers=self._headers, timeout=2000) as response:
+            if response.status_code != HTTPStatus.OK:
+                print("情報の取得に失敗しました。ステータスコード:", response.status_code)
+                print("レスポンス:", response.text)
+                return None
 
-        return NodeFilesList(response)
+            return NodeFilesList(response.json())
 
     def download_node(self, node_file: NodeFile, filename: str | Path | None = None) -> None:
         url = node_file.get_download_url(domain=self._domain)
@@ -65,11 +65,12 @@ class GRDMClient:
         elif filename is str:
             filename = Path(filename)
 
-        response = requests.get(url, headers=self._headers, stream=True, timeout=2000)
-        total_size = int(response.headers.get("content-length", 0))
-        with filename.open(mode="wb") as f:
-            pbar = tqdm(total=total_size, unit="B", unit_scale=True)
-            for chunk in response.iter_content(chunk_size=8192):
-                f.write(chunk)
-                pbar.update(len(chunk))
-            pbar.close()
+        with requests.get(url, headers=self._headers, stream=True, timeout=2000) as response:
+            total_size = int(response.headers.get("content-length", 0))
+            with (
+                filename.open(mode="wb") as f,
+                tqdm(total=total_size, unit="B", unit_scale=True) as pbar,
+            ):
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+                    pbar.update(len(chunk))
