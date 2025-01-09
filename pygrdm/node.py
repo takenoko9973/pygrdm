@@ -1,8 +1,6 @@
 from enum import Enum
 from typing import Any
 
-import requests
-
 
 class Kind(Enum):
     FILE = "file"
@@ -105,7 +103,7 @@ class NodeFilesList:
 
         return self._node_file_list[index]
 
-    def search_file(self, name: str) -> NodeFile | None:
+    def find_file(self, name: str) -> NodeFile | None:
         searched_node = list(filter(lambda file: file.name == name, self))
         if len(searched_node) == 0:
             return None

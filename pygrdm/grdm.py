@@ -37,7 +37,7 @@ class GRDMClient:
             if node_file_list is None:
                 return None
 
-            searched_node = node_file_list.search_file(dir_name)
+            searched_node = node_file_list.find_file(dir_name)
             if searched_node is None:
                 return None
 
