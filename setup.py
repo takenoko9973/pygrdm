@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="pygrdm",  # パッケージ名
-    version="0.1.1",  # バージョン
+    version="0.1.2",  # バージョン
     packages=find_packages(),  # パッケージの検出
     install_requires=[],
     description="GakuNin RDM閲覧パッケージ",
