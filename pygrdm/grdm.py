@@ -23,14 +23,14 @@ class GRDMClient:
             "Authorization": f"Bearer {self._token}"
         }
 
-    def fetch_node_file(self, node: str, osf_path: str) -> NodeFile | None:
-        if osf_path == "":
-            return None
+    def fetch_node_file(self, node: str, osf_path: str | Path) -> NodeFile | None:
+        if isinstance(osf_path, str):
+            osf_path = Path(osf_path)
 
         now_node_file = NodeFile.create_root(node, "osfstorage")
-        directries = osf_path.split("/")
+        directries = osf_path.parts
         for dir_name in directries:
-            if dir_name == "":
+            if dir_name in ("", "/"):
                 continue
 
             node_file_list = self.fetch_file_list(now_node_file)
