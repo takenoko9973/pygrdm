@@ -28,32 +28,32 @@ class GRDMClient:
 
         with requests.get(url, headers=self._headers, timeout=2000) as response:
             if response.status_code != HTTPStatus.OK:
-                print("情報の取得に失敗しました。ステータスコード:", response.status_code)
-                print("レスポンス:", response.text)
+                print("Request failed. Status code:", response.status_code)
+                print("Response:", response.text)
                 return None
 
             return NodeFilesList(response.json())
 
+    def fetch_node_file_in_dir(self, node_file: NodeFile, find_file_name: str) -> NodeFile | None:
+        node_file_list = self.fetch_file_list(node_file)
+        if node_file_list is None:
+            return None
+
+        return node_file_list.find_file(find_file_name)
+
     def fetch_node_file(self, node: str, osf_path: str | Path) -> NodeFile | None:
         osf_path = Path(osf_path)
 
-        now_node_file = NodeFile.create_root(node, "osfstorage")
-        directries = osf_path.parts
-        for dir_name in directries:
+        current_node_file = NodeFile.create_root(node, "osfstorage")
+        for dir_name in osf_path.parts:
             if dir_name in ("", "/"):
                 continue
 
-            node_file_list = self.fetch_file_list(now_node_file)
-            if node_file_list is None:
+            current_node_file = self.fetch_node_file_in_dir(current_node_file, dir_name)
+            if current_node_file is None:
                 return None
 
-            searched_node = node_file_list.find_file(dir_name)
-            if searched_node is None:
-                return None
-
-            now_node_file = searched_node
-
-        return now_node_file
+        return current_node_file
 
     def download_node(self, node_file: NodeFile, filename: str | Path | None = None) -> None:
         url = node_file.get_download_url(domain=self._domain)
