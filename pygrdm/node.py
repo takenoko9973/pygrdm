@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any
+from typing import Any, Self
 
 
 class Kind(Enum):
@@ -8,7 +8,7 @@ class Kind(Enum):
 
 
 class NodeFile:
-    def __init__(self, json_data: Any) -> None:  # noqa: ANN401
+    def __init__(self, json_data: dict[str, Any]) -> None:
         self._id = json_data["id"]
         self._node_id = json_data["relationships"]["target"]["data"]["id"]
         self._name = json_data["attributes"]["name"]
@@ -17,7 +17,7 @@ class NodeFile:
         self._materialized_path = json_data["attributes"]["materialized_path"]
 
     @staticmethod
-    def create_root(node_id: str, provider: str):  # noqa: ANN205
+    def create_root(node_id: str, provider: str) -> Self:
         init_data = {
             "id": "",
             "attributes": {
@@ -80,12 +80,12 @@ class NodeFile:
 
 
 class NodeFilesList:
-    def __init__(self, responsed_json: Any) -> None:  # noqa: ANN401
+    def __init__(self, responsed_json: dict[str, Any]) -> None:
         json_data = responsed_json["data"]
         self._i = 0
         self._node_file_list = [NodeFile(d) for d in json_data]
 
-    def __iter__(self):  # noqa: ANN204
+    def __iter__(self) -> Self:
         self._i = 0
         return self
 
