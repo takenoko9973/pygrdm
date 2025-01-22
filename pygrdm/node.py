@@ -9,24 +9,24 @@ class Kind(Enum):
 
 class NodeFile:
     def __init__(self, json_data: dict[str, Any]) -> None:
-        self._id = json_data["id"]
-        self._node_id = json_data["relationships"]["target"]["data"]["id"]
+        self._id = str(json_data["id"]).split("/", 1)[-1]
+        self._node_id = json_data["attributes"]["resource"]
         self._name = json_data["attributes"]["name"]
         self._kind = json_data["attributes"]["kind"]
         self._provider = json_data["attributes"]["provider"]
-        self._materialized_path = json_data["attributes"]["materialized_path"]
+        self._materialized_path = json_data["attributes"]["materialized"]
 
     @staticmethod
     def create_root(node_id: str, provider: str) -> Self:
         init_data = {
-            "id": "",
+            "id": f"",
             "attributes": {
+                "resource": node_id,
                 "name": "",
                 "kind": Kind.FOLDER.value,
                 "provider": provider,
-                "materialized_path": "",
-            },
-            "relationships": {"target": {"data": {"id": node_id}}},
+                "materialized": "",
+            }
         }
         return NodeFile(init_data)
 
@@ -61,7 +61,11 @@ class NodeFile:
         return f"https://api.{domain}/v2/files/{self.id}/"
 
     def get_files_list_url(self, domain: str = "rdm.nii.ac.jp") -> str:
-        url = f"https://api.{domain}/v2/nodes/{self.node_id}/files/{self.provider}/"
+        if self.kind != Kind.FOLDER.value:
+            msg = "Can only get file list url if node is folder."
+            raise Exception(msg)
+
+        url = f"https://files.{domain}/v1/resources/{self.node_id}/providers/{self.provider}/"
 
         if self.id != "":
             url += f"{self.id}/"
